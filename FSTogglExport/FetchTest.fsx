@@ -19,6 +19,13 @@ let query = [
     "end_date", dateTimeToIso (System.DateTime(2017, 11, 30))
 ]
 
-let basicAuth = ""
 
-fetchToggl "time_entries" query [ "Authorization", basicAuth ]
+type SecretSettings = JsonProvider<"../secrets.json">
+
+let secrets = SecretSettings.GetSample()
+
+secrets.ApiAuth
+
+let basicAuth = secrets.ApiAuth
+
+fetchToggl "time_entries" query [ "Authorization", basicAuth ] 

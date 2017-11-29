@@ -4,7 +4,8 @@
     <TargetFramework>net461</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Parameters.fs" />
+    <Compile Include="SecretSettings.fs" />
+    <Compile Include="Fetch.fs" />
     <Compile Include="FSTogglExport.fs" />
     <None Include="App.config" />
   </ItemGroup>

@@ -1,28 +1,22 @@
 module FSTogglExport
 
 open FSharp.Data
-open Parameters
+open SecretSettings
+open Fetch
 
-let fetchTimeEntries apiKey =
-    []    
+let fetchTimeEntries =
+    
 
 let convertTimesToFleStandard timeEntries =
-    []
+    timeEntries
 
-let proceed (parameters:Parameters) =
+let run =
     System.Console.WriteLine("Fetching entries...")
-    let timeEntries = fetchTimeEntries parameters.apiKey |> convertTimesToFleStandard
-    ()
-
-let run args =
-    let parameters = toParams args
-    match parameters.isValid with
-    | true -> proceed parameters
-    | false -> System.Console.WriteLine("Example usage: toggl-export --api-key xxxx");
+    let timeEntries = fetchTimeEntries |> convertTimesToFleStandard
+    System.Console.Write(timeEntries)
 
 [<EntryPoint>]
 let main argv =
-    run argv
+    run
     System.Console.ReadKey() |> ignore
-    0 // return an integer exit code
-
+    0
