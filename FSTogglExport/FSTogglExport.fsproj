@@ -13,4 +13,5 @@
     <Reference Include="../packages/FSharp.Data/lib/net45/FSharp.Data.dll" />
   </ItemGroup>
   <Import Project="..\.paket\Paket.Restore.targets" />
+  <Import Project="fsc.props" />
 </Project>
