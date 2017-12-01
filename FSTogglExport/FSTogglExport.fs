@@ -2,6 +2,8 @@ module FSTogglExport
 
 open SecretSettings
 open Fetch
+open FSharp.Data
+open JsonExtensions
 
 let apiAuth = getApiAuth
 
@@ -17,7 +19,10 @@ let fetchTimeEntries startDate endDate =
         "end_date", dateTimeToIso endDate
     ]
 
-    fetchToggl "time_entries" query []
+    let json = fetchToggl "time_entries" query []
+
+    JsonValue.Parse(json).AsArray()
+    |> Array.filter (fun entry -> (entry?duration.AsInteger()) >= 0)
 
 let convertTimesToFleStandard timeEntries =
     timeEntries
@@ -25,7 +30,8 @@ let convertTimesToFleStandard timeEntries =
 let run =
     System.Console.WriteLine("Fetching entries...")
     let timeEntries = fetchTimeEntries (System.DateTime(2017, 11, 1)) (System.DateTime(2017, 11, 30))
-    System.Console.Write(timeEntries)
+
+    System.Console.WriteLine(timeEntries)
 
 [<EntryPoint>]
 let main argv =
