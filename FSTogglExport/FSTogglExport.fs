@@ -16,8 +16,6 @@ let toDateRangeQuery startDate endDate = [
     "start_date", dateTimeToIso startDate; 
     "end_date", dateTimeToIso endDate
 ]
-
-
 let fetchTimeEntries fetchToggl startDate endDate = async {
     let query = [
         "start_date", dateTimeToIso startDate; 
@@ -91,8 +89,9 @@ let run = async {
     let apiAuth = getApiAuth
     let fetchToggl = (getFetchToggl apiAuth) []
     
-    let start = DateTime(2017, 11, 1)
-    let stop = DateTime(2017, 11, 30)
+    let now = DateTime.Now
+    let start = DateTime(now.Year, now.Month, 1)
+    let stop = DateTime(now.Year, now.Month, DateTime.DaysInMonth(now.Year, now.Month))
     let timeEntries = getTimeEntries fetchToggl start stop
 
     let workspaceIds = timeEntries |> List.map (fun e -> e.wid) |> List.distinct
