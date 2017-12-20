@@ -20,39 +20,21 @@ let toDateRangeQuery startDate endDate = [
     "end_date", dateTimeToIso endDate
 ]
 
-let fetchTimeEntries fetchToggl startDate endDate = async {
-    let query = [
-        "start_date", dateTimeToIso startDate; 
-        "end_date", dateTimeToIso endDate
-    ]
-
-    let! json = fetchToggl "time_entries" query
-
-    return JsonValue.Parse(json).AsArray()
-    |> List.ofArray
-    |> List.filter (fun entry -> (entry?duration.AsInteger()) >= 0)
-}
-
 let parseList json = JsonValue.Parse(json).AsArray() |> List.ofArray
 
 let toTimeEntries values =
     values 
-    |> List.map (fun entry -> 
+    |> List.map (fun entry ->
+        let start = entry?start.AsDateTime() 
         {
             description = (entry?description.AsString()); 
             wid = (entry?wid.AsInteger());
             pid = (entry?pid.AsInteger());
-            start = (entry?start.AsDateTime());
+            start = start;
             stop = (entry?stop.AsDateTime());
             duration = (entry?duration.AsInteger()) 
         }
     )
-
-let convertTimesToFleStandard timeEntries =
-    let fleZone = TimeZoneInfo.FindSystemTimeZoneById("FLE Standard Time")
-    let convert time = TimeZoneInfo.ConvertTimeFromUtc(DateTime.SpecifyKind(time, DateTimeKind.Utc), fleZone)
-    timeEntries
-    |> List.map (fun entry -> {entry with start = convert entry.start; stop = convert entry.stop})
 
 let getTimeEntries fetchToggl start stop =
     let fetchTimeEntries start stop = 
@@ -64,7 +46,6 @@ let getTimeEntries fetchToggl start stop =
     |> parseList
     |> List.filter (fun entry -> (entry?duration.AsInteger()) >= 0)
     |> toTimeEntries
-    |> convertTimesToFleStandard
 
 let toProjects values =
     values 
@@ -102,7 +83,6 @@ let mapToOutputEntries (timeEntries: TimeEntry list) projects =
     let getProjectName pid = projects |> List.find (fun p -> p.id = pid) |> fun p -> p.name
     let roundToHalfHours durInSecs = max (round (durInSecs / 3600.0 * 2.0) / 2.0) 0.5
 
-    // TODO: Day grouping should be done in local time
     timeEntries
     |> List.groupBy (fun e -> e.start.Date, e.description, e.pid)
     |> List.sortBy (fun ((date, _, _), entries) -> date, entries |> List.map (fun e -> e.stop) |> List.max)
