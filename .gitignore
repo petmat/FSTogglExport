@@ -394,3 +394,6 @@ paket-files/
 
 # Secrets
 secrets.json
+
+# Output file
+output.txt
