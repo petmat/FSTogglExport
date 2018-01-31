@@ -8,7 +8,7 @@ open System
 open System.IO
 open System.Text.RegularExpressions
 
-type TimeEntry = { description: string; wid: int; pid: int; start: DateTime; stop: DateTime; duration: int }
+type TimeEntry = { description: string; wid: int; pid: int option; start: DateTime; stop: DateTime; duration: int }
 type Project = { id: int; wid: int; name: string }
 type OutputEntry = { date: DateTime; code: string; duration: double; description: string; identifier: string }
 
@@ -23,13 +23,18 @@ let toDateRangeQuery startDate endDate = [
 let parseList json = JsonValue.Parse(json).AsArray() |> List.ofArray
 
 let toTimeEntries values =
+    let getPid (e: JsonValue) =
+        match e.TryGetProperty("pid") with
+        | Some p -> (Some (p.AsInteger()))
+        | None -> None
+
     values 
     |> List.map (fun entry ->
         let start = entry?start.AsDateTime() 
         {
             description = (entry?description.AsString()); 
             wid = (entry?wid.AsInteger());
-            pid = (entry?pid.AsInteger());
+            pid = (getPid entry);
             start = start;
             stop = (entry?stop.AsDateTime());
             duration = (entry?duration.AsInteger()) 
@@ -90,7 +95,7 @@ let mapToOutputEntries (timeEntries: TimeEntry list) projects =
         let identifier, description = splitToIdentifierAndDescription description
         {
             date = date;
-            code = getProjectName pid;
+            code = match pid with | Some id -> (getProjectName id) | None -> "";
             description = description;
             duration = entries |> List.sumBy (fun e -> e.duration) |> float |> roundToHalfHours;
             identifier = identifier;
