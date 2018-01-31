@@ -108,7 +108,7 @@ let run = async {
     
     let now = DateTime.Now
     let start = DateTime(now.Year, now.Month, 1)
-    let stop = DateTime(now.Year, now.Month, DateTime.DaysInMonth(now.Year, now.Month))
+    let stop = start.AddMonths(1)
     
     printfn "Fetching data..."
     let timeEntries = getTimeEntries fetchToggl start stop
