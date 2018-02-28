@@ -102,12 +102,13 @@ let mapToOutputEntries (timeEntries: TimeEntry list) projects =
         }
     )
 
-let run = async {
+let run (argv: string[]) = async {
     let apiAuth = getApiAuth
     let fetchToggl = (getFetchToggl apiAuth) []
-    
+
     let now = DateTime.Now
-    let start = DateTime(now.Year, now.Month, 1)
+    let month = if argv.Length = 1 then int (argv.[0]) else now.Month
+    let start = DateTime(now.Year, month, 1)
     let stop = start.AddMonths(1)
     
     printfn "Fetching data..."
@@ -132,6 +133,6 @@ let run = async {
 
 [<EntryPoint>]
 let main argv =
-    run |> Async.RunSynchronously
+    argv |> run |> Async.RunSynchronously
     System.Console.ReadKey() |> ignore
     0
