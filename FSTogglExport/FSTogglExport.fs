@@ -106,12 +106,14 @@ let run (argv: string[]) = async {
     let apiAuth = getApiAuth
     let fetchToggl = (getFetchToggl apiAuth) []
 
+    printfn "args: %A" argv
+
     let now = DateTime.Now
     let month = if argv.Length = 1 then int (argv.[0]) else now.Month
     let start = DateTime(now.Year, month, 1)
     let stop = start.AddMonths(1)
     
-    printfn "Fetching data..."
+    printfn "Fetching data from %A to %A ..." start stop
     let timeEntries = getTimeEntries fetchToggl start stop
     let workspaceIds = timeEntries |> List.map (fun e -> e.wid) |> List.distinct
     let projects = getProjects fetchToggl workspaceIds
