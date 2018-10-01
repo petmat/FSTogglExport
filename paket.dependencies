@@ -4,3 +4,5 @@ framework: >= net461
 nuget FAKE
 nuget FSharp.Core
 nuget FSharp.Data
+nuget Microsoft.WindowsAzure.ConfigurationManager
+nuget WindowsAzure.Storage

@@ -7,6 +7,9 @@ open JsonExtensions
 open System
 open System.IO
 open System.Text.RegularExpressions
+open Microsoft.Azure
+open Microsoft.WindowsAzure.Storage
+open Microsoft.WindowsAzure.Storage.Blob
 
 type TimeEntry = { description: string; wid: int; pid: int option; start: DateTime; stop: DateTime; duration: int }
 type Project = { id: int; wid: int; name: string }
@@ -130,6 +133,13 @@ let run (argv: string[]) = async {
     let lines = outputEntries |> List.map entryToString
     printfn "Writing to file..."
     File.WriteAllLines("output.txt", lines);
+    printfn "Writing to blob storage..."
+    let storageConnString = getBlobConnectionString
+    let storageAccount = CloudStorageAccount.Parse(storageConnString)
+    let blobClient = storageAccount.CreateCloudBlobClient()
+    let container = blobClient.GetContainerReference("toggl-exports")
+    let blockBlob = container.GetBlockBlobReference("output.txt")
+    do blockBlob.UploadFromFile("output.txt")
     printfn "All done!"
 }
 
