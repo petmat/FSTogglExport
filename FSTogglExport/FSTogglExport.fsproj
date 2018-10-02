@@ -7,6 +7,7 @@
   <ItemGroup>
     <Compile Include="SecretSettings.fs" />
     <Compile Include="Fetch.fs" />
+    <Compile Include="CustomUtils.fs" />
     <Compile Include="FSTogglExport.fs" />
     <None Include="App.config" />
   </ItemGroup>

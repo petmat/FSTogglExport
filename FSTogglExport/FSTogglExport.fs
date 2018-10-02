@@ -10,6 +10,7 @@ open System.Text.RegularExpressions
 open Microsoft.Azure
 open Microsoft.WindowsAzure.Storage
 open Microsoft.WindowsAzure.Storage.Blob
+open CustomUtils
 
 type TimeEntry = { description: string; wid: int; pid: int option; start: DateTime; stop: DateTime; duration: int }
 type Project = { id: int; wid: int; name: string }
@@ -112,8 +113,9 @@ let run (argv: string[]) = async {
     printfn "args: %A" argv
 
     let now = DateTime.Now
-    let month = if argv.Length = 1 then int (argv.[0]) else now.Month
-    let start = DateTime(now.Year, month, 1)
+    let year = if argv.Length > 0 then int (argv.[0]) else now.Year
+    let month = if argv.Length > 1 then int (argv.[1]) else now.Month
+    let start = DateTime(year, month, 1)
     let stop = start.AddMonths(1)
     
     printfn "Fetching data from %A to %A ..." start stop
@@ -138,7 +140,8 @@ let run (argv: string[]) = async {
     let storageAccount = CloudStorageAccount.Parse(storageConnString)
     let blobClient = storageAccount.CreateCloudBlobClient()
     let container = blobClient.GetContainerReference("toggl-exports")
-    let blockBlob = container.GetBlockBlobReference("output.txt")
+    let blobName = sprintf "output-%s-%s.txt" (toTwoCharString year) (toTwoCharString month)
+    let blockBlob = container.GetBlockBlobReference(blobName)
     do blockBlob.UploadFromFile("output.txt")
     printfn "All done!"
 }
